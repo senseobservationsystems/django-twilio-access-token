@@ -5,11 +5,9 @@ python:
 services:
   - docker
 
-install:
+before_script:
   - pip install flake8
-
-before_script: pip install docker-compose
+  - pip install docker-compose
 
 script:
-  - flake8 --ignore=E501,E271,E272,W602,W504 --exclude=submodules
-  - docker exec -it django-twilio-access-token\_app\_1 python manage.py test
+  - docker-compose run app sh -c "python manage.py test && flake8 --ignore=E501,E271,E272,W602,W504 --exclude=submodules"
