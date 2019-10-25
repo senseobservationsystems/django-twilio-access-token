@@ -36,7 +36,10 @@ class TwilioAccessToken(object):
             -------
             TypeError: 1. msg (str)   :   { "room_name": ["Field is required."] }
                           code (int)  :   400
+                       2. msg (str)   :   { "valid_until": ["Field is not a date format."] }
+                          code (int)  :   400
             KeyError:  1. Room name is None or empty or only contain space.
+                       2. Invalid date format of `valid_until` value.
         """
 
         # Discover twilio video secrets and initialise access token.
@@ -96,6 +99,12 @@ class TwilioAccessToken(object):
             Secret (str):
                 A secret key of particular Twilio Service. You can obtain this key altogether
                 when you creating a Signing Key SID.
+
+            Raises:
+            -------
+            TypeError: 1. msg (str)   :   { "valid_until": ["Field is not a date format."] }
+                          code (int)  :   400
+            KeyError:  1. Invalid date format of `valid_until` value.
         """
         self.__token = AccessToken(
             account_sid=account_sid,
