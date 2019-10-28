@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.conf import settings
 
-from ..models import TwilioAccessToken
+from ..tokens import TwilioAccessToken
 
 
 class TestTwilioModels(TestCase):
