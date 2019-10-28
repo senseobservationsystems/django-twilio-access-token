@@ -5,9 +5,10 @@ python:
 services:
   - docker
 
-before_script:
+install:
   - pip install flake8
   - pip install docker-compose
 
 script:
-  - docker-compose run app sh -c "python manage.py test && flake8 --ignore=E501,E271,E272,W602,W504 --exclude=submodules"
+  - flake8 --ignore=E501,E271,E272,W602,W504 --exclude=submodules
+  - docker-compose run app sh -c "python manage.py test"
