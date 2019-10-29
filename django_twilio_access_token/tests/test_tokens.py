@@ -1,24 +1,13 @@
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.conf import settings
 
 from ..tokens import TwilioAccessToken
 
 
-class TestTwilioModels(TestCase):
+class TestTwilioTokens(TestCase):
 
     def setUp(self):
         self.twilio = TwilioAccessToken()
-
-    def backup_twilio_keys(self):
-        self.SID = settings.TWILIO_ACCOUNT_SID
-        self.KEY_SID = settings.TWILIO_VIDEO_API_KEY_SID
-        self.SECRET = settings.TWILIO_VIDEO_API_KEY_SECRET
-
-    def restore_twilio_keys(self):
-        settings.TWILIO_ACCOUNT_SID = self.SID
-        settings.TWILIO_VIDEO_API_KEY_SID = self.KEY_SID
-        settings.TWILIO_VIDEO_API_KEY_SECRET = self.SECRET
 
     def test_get_token_for_video_calling_with_valid_room_name(self):
         """Test retrieve twilio access token for video calling, return valid tokens."""
@@ -26,25 +15,6 @@ class TestTwilioModels(TestCase):
         result = self.twilio.get_token()
 
         self.assertTrue('token' in result)
-
-    def test_get_token_with_twilio_secrets_that_are_not_exists_in_settings(self):
-        """Test get token with twilio secrests that aren't exists in settings"""
-        self.backup_twilio_keys()
-
-        # Remove keys from settings
-        del settings.TWILIO_ACCOUNT_SID
-        del settings.TWILIO_VIDEO_API_KEY_SID
-        del settings.TWILIO_VIDEO_API_KEY_SECRET
-
-        with self.assertRaises(AttributeError) as ctx:
-            self.twilio.grant_video_call_permission('a_room_name')
-
-        expected_message = (
-            'Could not find TWILIO_ACCOUNT_SID or TWILIO_VIDEO_API_KEY_SID '
-            'or TWILIO_VIDEO_API_KEY_SECRET in environment variables, or django project settings.'
-        )
-        self.assertEqual(expected_message, str(ctx.exception))
-        self.restore_twilio_keys()
 
     def test_grant_permission_for_video_calling_with_invalid_room_name(self):
         """Test retrieve twilio access token for video calling with an exception when room name is invalid"""
@@ -90,16 +60,15 @@ class TestTwilioModels(TestCase):
 
     def test_get_token_with_invalid_twilio_keys(self):
         """Test retrieve twilio access token but no twilio keys are provided, `ImproperlyConfigured` exception will arise."""
-        self.backup_twilio_keys()
 
-        settings.TWILIO_ACCOUNT_SID = None
-        settings.TWILIO_VIDEO_API_KEY_SID = None
-        settings.TWILIO_VIDEO_API_KEY_SECRET = None
+        class MockTwilioTokens(TwilioAccessToken):
+            def _TwilioAccessToken__init_access_token(self, account_sid, signing_key_sid, secret):
+                return super()._TwilioAccessToken__init_access_token(None, None, None)
 
-        self.twilio.grant_video_call_permission('some-random-room')
+        twilio = MockTwilioTokens()
+        twilio.grant_video_call_permission('some-random-room')
 
         with self.assertRaises(ImproperlyConfigured) as ctx:
-            self.twilio.get_token()
+            twilio.get_token()
 
         self.assertIn('JWT does not have a signing key configured.', str(ctx.exception))
-        self.restore_twilio_keys()
