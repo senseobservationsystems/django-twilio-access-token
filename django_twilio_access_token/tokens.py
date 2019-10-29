@@ -3,7 +3,8 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import VideoGrant
 
-from .utils import discover_twilio_video_credentials
+from .settings import TWILIO_ACCOUNT_SID, \
+    TWILIO_VIDEO_API_KEY_SID, TWILIO_VIDEO_API_KEY_SECRET
 
 
 class TwilioAccessToken(object):
@@ -41,10 +42,11 @@ class TwilioAccessToken(object):
             KeyError:  1. Room name is None or empty or only contain space.
                        2. Invalid date format of `valid_until` value.
         """
-
-        # Discover twilio video secrets and initialise access token.
-        secrets = discover_twilio_video_credentials()
-        self.__init_access_token(secrets[0], secrets[1], secrets[2])
+        self.__init_access_token(
+            TWILIO_ACCOUNT_SID,
+            TWILIO_VIDEO_API_KEY_SID,
+            TWILIO_VIDEO_API_KEY_SECRET
+        )
 
         if not room_name or room_name.isspace():
             raise ValidationError({'room_name': ['Field is required.']}, code='invalid')
