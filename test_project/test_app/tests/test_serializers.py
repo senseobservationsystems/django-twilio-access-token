@@ -2,7 +2,7 @@ from dateutil.parser import parse
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
-from ..serializers import VideoTokenDeserializer
+from django_twilio_access_token.serializers import VideoTokenDeserializer
 
 
 class TestVideoTokenDeserializer(APITestCase):
@@ -67,6 +67,38 @@ class TestVideoTokenDeserializer(APITestCase):
             ctx.exception.detail,
             {
                 'room_name': [ErrorDetail(string='This field is required.', code='required')]
+            }
+        )
+
+    def test_deserializer_with_invalid_room_name(self):
+        """Test video token deserializer with invalid room name"""
+        request = self.factory.post('/token/')
+        # Assert room name that contain empty string
+        payload = {
+            "identity": "some-identity",
+            "room_name": "",
+            "valid_until": "2019-10-17T15:53:00+07:00"
+        }
+        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        with self.assertRaises(ValidationError) as ctx:
+            deserializer.is_valid(raise_exception=True)
+
+        self.assertDictEqual(
+            ctx.exception.detail,
+            {
+                'room_name': [ErrorDetail(string='This field may not be blank.', code='blank')]
+            }
+        )
+        # Assert room name that only has space characters
+        payload['room_name'] = "     "
+        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        with self.assertRaises(ValidationError) as ctx:
+            deserializer.is_valid(raise_exception=True)
+
+        self.assertDictEqual(
+            ctx.exception.detail,
+            {
+                'room_name': [ErrorDetail(string='This field may not be blank.', code='blank')]
             }
         )
 

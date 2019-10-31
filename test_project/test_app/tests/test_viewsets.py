@@ -40,6 +40,20 @@ class TestTwilioAccessTokenViewSets(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('This field is required.', response.data['room_name'])
 
+    def test_get_video_calling_access_token_with_invalid_room_name(self):
+        """Test retrieve an access token for video calling with invalid `room_name`"""
+        # Assert room name that contain empty string
+        request_body = {"room_name": ""}
+        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('This field may not be blank.', response.data['room_name'])
+
+        # Assert room name that only has space characters
+        request_body = {"room_name": "    "}
+        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('This field may not be blank.', response.data['room_name'])
+
     def test_get_video_calling_access_token_with_invalid_value_of_valid_until(self):
         """Test retrieve an access token for video calling with invalid value of `valid_until` is not allowed"""
         request_body = {

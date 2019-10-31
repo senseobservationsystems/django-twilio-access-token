@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 
-from .. import utils
+from django_twilio_access_token import utils
 
 
 class TestUtils(TestCase):
