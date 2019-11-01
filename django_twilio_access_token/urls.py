@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from django_twilio_access_token import views
 
 
 # Create a router and register our viewsets with it.

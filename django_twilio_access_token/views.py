@@ -1,13 +1,11 @@
+from django.conf import settings
+from django_twilio_access_token.serializers import VideoTokenDeserializer
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import VideoGrant
-
-from .serializers import VideoTokenDeserializer
-from .settings import TWILIO_ACCOUNT_SID, \
-    TWILIO_VIDEO_API_KEY_SID, TWILIO_VIDEO_API_KEY_SECRET
 
 
 class TwilioAccessTokenViewSet(viewsets.ViewSet):
@@ -29,8 +27,8 @@ class TwilioAccessTokenViewSet(viewsets.ViewSet):
 
         # create access token for Twilio Video
         twilio_token = AccessToken(
-            account_sid=TWILIO_ACCOUNT_SID, signing_key_sid=TWILIO_VIDEO_API_KEY_SID,
-            secret=TWILIO_VIDEO_API_KEY_SECRET, valid_until=validated_data['valid_until'])
+            account_sid=settings.TWILIO_ACCOUNT_SID, signing_key_sid=settings.TWILIO_VIDEO_API_KEY_SID,
+            secret=settings.TWILIO_VIDEO_API_KEY_SECRET, valid_until=validated_data['valid_until'])
         twilio_token.identity = validated_data['identity']
 
         # create video grant instance
