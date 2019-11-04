@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 
@@ -10,7 +11,7 @@ class TestTwilioAccessTokenViewSets(APITestCase):
             "valid_until": "2019-10-17T15:53:00+07:00",
             "room_name": "some-random-room-name"
         }
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
         self.assertIsNotNone(response.data['token'])
@@ -21,7 +22,7 @@ class TestTwilioAccessTokenViewSets(APITestCase):
             "valid_until": "2019-10-17T15:53:00+07:00",
             "room_name": "some-random-room-name"
         }
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
         self.assertIsNotNone(response.data['token'])
@@ -29,14 +30,14 @@ class TestTwilioAccessTokenViewSets(APITestCase):
     def test_get_video_calling_access_token_without_valid_until(self):
         """Test retrieve an access token for video calling without `valid_until` is allowed"""
         request_body = {"room_name": "some-random-room-name"}
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
         self.assertIsNotNone(response.data['token'])
 
     def test_get_video_calling_access_token_without_room_name(self):
         """Test retrieve an access token for video calling without `room_name` is not allowed"""
-        response = self.client.post('/twilio/token/video/', data={}, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data={}, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('This field is required.', response.data['room_name'])
 
@@ -44,13 +45,13 @@ class TestTwilioAccessTokenViewSets(APITestCase):
         """Test retrieve an access token for video calling with invalid `room_name`"""
         # Assert room name that contain empty string
         request_body = {"room_name": ""}
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('This field may not be blank.', response.data['room_name'])
 
         # Assert room name that only has space characters
         request_body = {"room_name": "    "}
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('This field may not be blank.', response.data['room_name'])
 
@@ -61,14 +62,14 @@ class TestTwilioAccessTokenViewSets(APITestCase):
             "valid_until": "invalid-date",
             "room_name": "some-random-room-name"
         }
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', response.data['valid_until'])
 
     def test_deserializer_with_invalid_invalid_data(self):
         """Test retrieve an access token for video calling with invalid data"""
         request_body = {"valid_until": "invalid-date"}
-        response = self.client.post('/twilio/token/video/', data=request_body, format='json')
+        response = self.client.post(reverse('twilio:twilio-token-video'), data=request_body, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('This field is required.', response.data['room_name'])
         self.assertIn('Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', response.data['valid_until'])

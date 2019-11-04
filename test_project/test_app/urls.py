@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     # add django twilio access token urls
-    url(r'^twilio/', include('django_twilio_access_token.urls')),
+    url(r'^twilio/', include(('django_twilio_access_token.urls', 'twilio'), namespace='twilio')),
 ]
