@@ -15,10 +15,9 @@ class TwilioAccessTokenViewSet(viewsets.ViewSet):
         """
         Get token for video calling over particular room.
         """
-
-        # validate request.data from incoming request.
+        serializer = VideoTokenDeserializer(data=request.data)
         try:
-            serializer = VideoTokenDeserializer(data=request.data)
+            # validate request.data from incoming request.
             serializer.is_valid(True)
         except ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
