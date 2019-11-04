@@ -12,13 +12,12 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_with_valid_payload(self):
         """Test video token deserializer with valid payload"""
-        request = self.factory.post('/token/')
         payload = {
             "identity": "some-identity",
             "valid_until": "2019-10-17T15:53:00+07:00",
             "room_name": "some-random-room-name"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         deserializer.is_valid(raise_exception=True)
 
         self.assertIsNotNone(deserializer.validated_data)
@@ -28,12 +27,11 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_without_identity(self):
         """Test video token deserializer without identity is allowed"""
-        request = self.factory.post('/token/')
         payload = {
             "valid_until": "2019-10-17T15:53:00+07:00",
             "room_name": "some-random-room-name"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         deserializer.is_valid(raise_exception=True)
 
         self.assertIsNotNone(deserializer.validated_data)
@@ -42,11 +40,10 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_without_valid_until(self):
         """Test video token deserializer without `valid_until` is allowed"""
-        request = self.factory.post('/token/')
         payload = {
             "room_name": "some-random-room-name"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         deserializer.is_valid(raise_exception=True)
 
         self.assertIsNotNone(deserializer.validated_data)
@@ -54,12 +51,11 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_without_room_name(self):
         """Test video token deserializer without room name is not allowed"""
-        request = self.factory.post('/token/')
         payload = {
             "identity": "some-identity",
             "valid_until": "2019-10-17T15:53:00+07:00"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         with self.assertRaises(ValidationError) as ctx:
             deserializer.is_valid(raise_exception=True)
 
@@ -72,14 +68,13 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_with_invalid_room_name(self):
         """Test video token deserializer with invalid room name"""
-        request = self.factory.post('/token/')
         # Assert room name that contain empty string
         payload = {
             "identity": "some-identity",
             "room_name": "",
             "valid_until": "2019-10-17T15:53:00+07:00"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         with self.assertRaises(ValidationError) as ctx:
             deserializer.is_valid(raise_exception=True)
 
@@ -91,7 +86,7 @@ class TestVideoTokenDeserializer(APITestCase):
         )
         # Assert room name that only has space characters
         payload['room_name'] = "     "
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         with self.assertRaises(ValidationError) as ctx:
             deserializer.is_valid(raise_exception=True)
 
@@ -104,13 +99,12 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_with_invalid_value_of_valid_until(self):
         """Test video token deserializer with invalid value of `valid_until` is not allowed"""
-        request = self.factory.post('/token/')
         payload = {
             "identity": "some-identity",
             "valid_until": "invalid-date",
             "room_name": "some-random-room-name"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         with self.assertRaises(ValidationError) as ctx:
             deserializer.is_valid(raise_exception=True)
 
@@ -123,11 +117,10 @@ class TestVideoTokenDeserializer(APITestCase):
 
     def test_deserializer_with_invalid_payload(self):
         """Test video token deserializer with invalid value of `valid_until` is not allowed"""
-        request = self.factory.post('/token/')
         payload = {
             "valid_until": "invalid-date"
         }
-        deserializer = VideoTokenDeserializer(data=payload, context={'request': request})
+        deserializer = VideoTokenDeserializer(data=payload)
         with self.assertRaises(ValidationError) as ctx:
             deserializer.is_valid(raise_exception=True)
 
