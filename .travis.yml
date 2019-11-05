@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.6"
+
+install:
+  - ./scripts/requirements-install.sh travis
+
+script:
+  - ./scripts/checker.sh travis
