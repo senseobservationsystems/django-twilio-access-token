@@ -1,5 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
+from django.urls import path, include
 from django_twilio_access_token import views
 
 
@@ -7,4 +8,8 @@ from django_twilio_access_token import views
 router = DefaultRouter()
 router.register(r'token', views.TwilioAccessTokenViewSet, base_name='twilio-token')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('', include(router.urls)),
+    path('room/', views.TwilioPeerToPeerRoomView.as_view(), name='peer-to-peer-room'),
+    path('room/group/', views.TwilioGroupRoomView.as_view(), name='group-room'),
+]
