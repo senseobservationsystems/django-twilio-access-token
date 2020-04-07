@@ -13,7 +13,7 @@ class TwilioAccessTokenViewSet(viewsets.ViewSet):
     @action(methods=['post'], detail=False)
     def video(self, request):
         """
-        Get token for video calling over particular room.
+        Obtain token for video calling over particular room.
         """
         serializer = VideoTokenDeserializer(data=request.data)
         try:
