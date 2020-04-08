@@ -1,14 +1,11 @@
 from dateutil.parser import parse
-from rest_framework.test import APITestCase, APIRequestFactory
+from django.test import TestCase
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from django_twilio_access_token.serializers import VideoTokenDeserializer
 
 
-class TestVideoTokenDeserializer(APITestCase):
-
-    def setUp(self):
-        self.factory = APIRequestFactory()
+class TestVideoTokenDeserializer(TestCase):
 
     def test_deserializer_with_valid_payload(self):
         """Test video token deserializer with valid payload"""
