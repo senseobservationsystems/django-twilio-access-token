@@ -82,11 +82,11 @@ class GroupRoomDeserializer(BaseRoomDeserializer):
 class PeerToPeerRoomDeserializer(BaseRoomDeserializer):
     """
     Deserializer that can be used to peer-to-peer Twilio Room via REST
-    @see https://www.twilio.com/docs/video/api/rooms-resource#example-3-create-a-group-room-enable-recording-and-set-a-status-callback-url
+    @see https://www.twilio.com/docs/video/api/rooms-resource#example-2-create-a-peer-to-peer-room-called-salesmeeting-with-network-traversal-service-turn-disabled-and-the-status-callback-url-set
     """
     PEER_TO_PEER = 'peer-to-peer'
     PEER_TO_PEER_ROOM_CHOICES = (
-        (PEER_TO_PEER, 'Group room can hold up to 10 participants.'),
+        (PEER_TO_PEER, 'Peer to peer room can hold up to 10 participants.'),
     )
     enable_turn = serializers.BooleanField(default=True)
     type = serializers.ChoiceField(choices=PEER_TO_PEER_ROOM_CHOICES)
