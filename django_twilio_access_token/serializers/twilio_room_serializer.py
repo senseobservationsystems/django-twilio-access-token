@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from twilio.base.exceptions import TwilioException, TwilioRestException
@@ -36,32 +37,22 @@ class BaseRoomDeserializer(serializers.Serializer):
                             username=settings.TWILIO_ACCOUNT_SID,
                             password=settings.TWILIO_AUTH_TOKEN)
         except TwilioException as e:
-            # `TwilioException` arised when username and password is not provided
-            detail = self._get_twilio_error_dict(str(e), 'invalid-settings')
-            raise ValidationError(detail=detail, code='invalid')
+            """TwilioException arise when username and password is not provided"""
+            raise ImproperlyConfigured(str(e))
 
         try:
             room_name = validated_data.pop('room_name')
             room = client.video.rooms.create(**validated_data, unique_name=room_name)
         except TwilioRestException as e:
-            # `TwilioRestException` arised when the Twilio Client attempt to create a Room
-            detail = self._get_twilio_error_dict(e.msg, e.code)
+            """
+            TwilioRestException arise when the Twilio Client attempt to create a Room
+            apart from that a Twilio-specific error code is not available for all errors
+            @see https://github.com/twilio/twilio-python/blob/709b772c187043c4120bb5c2be3d629d549e792b/twilio/base/exceptions.py#L11-L19
+            """
+            detail = {'twilio_err_code': 'unknown' if e.code is None else e.code, 'twilio_err_msg': e.msg}
             raise ValidationError(detail=detail, code='invalid')
 
         return room
-
-    def _get_twilio_error_dict(self, msg, code=None):
-        """
-        Convert incoming message and code into Twilio Error dictionary.
-
-        :param str msg: A human-readable message for the Twilio error.
-        :param int|None code: A Twilio-specific error code for the error. This is
-            not available for all errors.
-        :returns: Twilio Error dictionary
-        :rtype: dict
-        """
-        err_code = 'unknown' if code is None else code
-        return {'twilio_err_code': err_code, 'twilio_err_msg': msg}
 
 
 class GroupRoomDeserializer(BaseRoomDeserializer):
