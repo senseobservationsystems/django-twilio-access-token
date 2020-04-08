@@ -10,7 +10,7 @@ def mock_create(*args, **kwargs):
     from twilio.rest.video.v1.room import RoomInstance
     return RoomInstance(
         version='test',
-        payload={'unique_name': 'some-unique-name', 'sid': 'random-session-id'})
+        payload={'unique_name': '1234567890123456789012345678901234', 'sid': 'random-session-id'})
 
 
 class TestTwilioGroupRoomView(APITestCase):
@@ -18,7 +18,7 @@ class TestTwilioGroupRoomView(APITestCase):
     def setUp(self):
         self.request_body = {
             "status_callback": "http://example.org",
-            "unique_name": "some-unique-name",
+            "room_name": "1234567890123456789012345678901234",
             "record_participants_on_connect": True,
             "type": "group"
         }
@@ -27,7 +27,7 @@ class TestTwilioGroupRoomView(APITestCase):
     def test_create_group_room_with_valid_data(self, mock_room_create):
         """Test create Twilio group room with valid data success."""
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -41,7 +41,7 @@ class TestTwilioGroupRoomView(APITestCase):
         self.request_body['type'] = 'group-small'
 
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -49,25 +49,35 @@ class TestTwilioGroupRoomView(APITestCase):
 
         mock_room_create.assert_called_once()
 
-    def test_create_group_room_with_unique_name_less_than_five_chars(self):
-        """Test create Twilio group room with `unique_name` less than 5 characters is not allowed"""
-        self.request_body['unique_name'] = "abcd"
+    def test_create_group_room_with_room_name_less_than_minimum_chars(self):
+        """Test create Twilio group room with `room_name` less than 34 characters is not allowed"""
+        self.request_body['room_name'] = "abcd"
 
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
 
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.data)
-        self.assertIn('Ensure this field has at least 5 characters.', response.data['unique_name'])
+        self.assertIn('Ensure this field has at least 34 characters.', response.data['room_name'])
+
+    def test_create_group_room_with_room_name_more_than_maximum_chars(self):
+        """Test create Twilio peer-to-peer room with `room_name` more than 34 characters is not allowed"""
+        self.request_body['room_name'] = "12345678901234567890123456789012345"
+
+        response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNotNone(response.data)
+        self.assertIn('Ensure this field has no more than 34 characters.', response.data['room_name'])
 
     def test_create_group_room_without_unique_name(self):
-        """Test create Twilio group room without `unique_name` is not allowed"""
-        del self.request_body['unique_name']
+        """Test create Twilio group room without `room_name` is not allowed"""
+        del self.request_body['room_name']
 
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
 
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.data)
-        self.assertIn('This field is required.', response.data['unique_name'])
+        self.assertIn('This field is required.', response.data['room_name'])
 
     @patch('twilio.rest.video.v1.room.RoomList.create', side_effect=mock_create)
     def test_create_group_room_without_status_callback(self, mock_room_create):
@@ -75,7 +85,7 @@ class TestTwilioGroupRoomView(APITestCase):
         del self.request_body['status_callback']
 
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -89,7 +99,7 @@ class TestTwilioGroupRoomView(APITestCase):
         del self.request_body['record_participants_on_connect']
 
         response = self.client.post(reverse('twilio:group-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -123,7 +133,7 @@ class TestTwilioPeerToPeerRoomView(APITestCase):
     def setUp(self):
         self.request_body = {
             "status_callback": "http://example.org",
-            "unique_name": "some-unique-name",
+            "room_name": "1234567890123456789012345678901234",
             "enable_turn": True,
             "type": "peer-to-peer"
         }
@@ -132,7 +142,7 @@ class TestTwilioPeerToPeerRoomView(APITestCase):
     def test_create_peer_to_peer_room_with_valid_data(self, mock_room_create):
         """Test create Twilio peer-to-peer room with valid data success"""
         response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -140,25 +150,35 @@ class TestTwilioPeerToPeerRoomView(APITestCase):
 
         mock_room_create.assert_called_once()
 
-    def test_create_peer_to_peer_room_with_unique_name_less_than_five_chars(self):
-        """Test create Twilio peer-to-peer room with `unique_name` less than 5 characters is not allowed"""
-        self.request_body['unique_name'] = "abcd"
+    def test_create_peer_to_peer_room_with_room_name_less_than_minimum_chars(self):
+        """Test create Twilio peer-to-peer room with `room_name` less than 34 characters is not allowed"""
+        self.request_body['room_name'] = "abcd"
 
         response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
 
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.data)
-        self.assertIn('Ensure this field has at least 5 characters.', response.data['unique_name'])
+        self.assertIn('Ensure this field has at least 34 characters.', response.data['room_name'])
+
+    def test_create_peer_to_peer_room_with_room_name_more_than_maximum_chars(self):
+        """Test create Twilio peer-to-peer room with `room_name` more than 34 characters is not allowed"""
+        self.request_body['room_name'] = "12345678901234567890123456789012345"
+
+        response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNotNone(response.data)
+        self.assertIn('Ensure this field has no more than 34 characters.', response.data['room_name'])
 
     def test_create_peer_to_peer_room_without_unique_name(self):
-        """Test create Twilio peer-to-peer room without `unique_name` is not allowed"""
-        del self.request_body['unique_name']
+        """Test create Twilio peer-to-peer room without `room_name` is not allowed"""
+        del self.request_body['room_name']
 
         response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
 
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.data)
-        self.assertIn('This field is required.', response.data['unique_name'])
+        self.assertIn('This field is required.', response.data['room_name'])
 
     @patch('twilio.rest.video.v1.room.RoomList.create', side_effect=mock_create)
     def test_create_peer_to_peer_room_without_status_callback(self, mock_room_create):
@@ -166,7 +186,7 @@ class TestTwilioPeerToPeerRoomView(APITestCase):
         del self.request_body['status_callback']
 
         response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -180,7 +200,7 @@ class TestTwilioPeerToPeerRoomView(APITestCase):
         del self.request_body['enable_turn']
 
         response = self.client.post(reverse('twilio:peer-to-peer-room'), data=self.request_body, format='json')
-        expected_response = {"name": "some-unique-name", "sid": "random-session-id"}
+        expected_response = {"room_name": "1234567890123456789012345678901234", "sid": "random-session-id"}
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
