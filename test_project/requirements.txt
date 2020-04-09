@@ -1,3 +1,4 @@
-Django>=2.2.3,<2.2.5
+Django>=2.2.3,<3.0.6
 djangorestframework>=3.9.0,<3.10.3
-twilio~=6.32.0
+drf-rw-serializers==1.0.2
+twilio~=6.38.0

@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 
-class TestTwilioAccessTokenViewSets(APITestCase):
+class TestTwilioVideoAccessTokenView(APITestCase):
 
     def test_get_video_calling_access_token_with_valid_data(self):
         """Test retrieve an access token for video calling with valid data"""

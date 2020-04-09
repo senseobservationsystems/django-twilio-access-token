@@ -1,14 +1,31 @@
 from dateutil.parser import parse
-from rest_framework.test import APITestCase, APIRequestFactory
+from django.test import TestCase
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
-from django_twilio_access_token.serializers import VideoTokenDeserializer
+from django_twilio_access_token.serializers import VideoTokenDeserializer, TokenSerializer
 
 
-class TestVideoTokenDeserializer(APITestCase):
+class TestTokenSerializer(TestCase):
 
-    def setUp(self):
-        self.factory = APIRequestFactory()
+    def test_serializer(self):
+        """Test response serializer must have new token"""
+        payload = {
+            "identity": "some-identity",
+            "valid_until": "2019-10-17T15:53:00+07:00",
+            "room_name": "some-random-room-name"
+        }
+
+        deserializer = VideoTokenDeserializer(data=payload)
+        try:
+            deserializer.is_valid(raise_exception=True)
+        except Exception as e:
+            self.fail("Unexpected error occurred: " + str(e))
+        deserializer.save()
+
+        self.assertIsNotNone(TokenSerializer(deserializer.instance).data['token'])
+
+
+class TestVideoTokenDeserializer(TestCase):
 
     def test_deserializer_with_valid_payload(self):
         """Test video token deserializer with valid payload"""
