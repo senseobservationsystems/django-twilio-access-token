@@ -1,4 +1,4 @@
 Django>=2.2.3,<3.0.6
 djangorestframework>=3.9.0,<3.11.2
-drf-rw-serializers==1.0.2
+drf-rw-serializers==1.0.3
 twilio~=6.38.0
