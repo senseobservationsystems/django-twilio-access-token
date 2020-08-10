@@ -12,9 +12,8 @@ install_app_requirements() {
     # Use virtualenv for internal testing.
     if [ -z "$RUN_INTERNALLY" ]; then
         echo "Preparing virtualenv on your machine..."
-        pip install virtualenv
-        virtualenv -p python3 venv
-        source venv/bin/activate
+        python3 -m venv .venv
+        source .venv/bin/activate
         echo ""
     fi
 
