@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.4] - 2020-08-31
+### Updated
+- Updates twilio requirement from ~=6.44.2 to ~=6.45.0
+
 ## [0.0.3] - 2020-08-10
 ### Updated
 - Updates the requirements on [django](https://github.com/django/django) to permit the latest version `<3.2.0`.
