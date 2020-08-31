@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="django-twilio-access-token",
-    version="0.0.3",
+    version="0.0.4",
     author="Panji Y. Wiwaha",
     author_email="panjiyudasetya@gmail.com",
     description="A Django app to generate Twilio access token for particular Twilio services.",
